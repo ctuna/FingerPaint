@@ -69,7 +69,7 @@ public class MainActivity extends Activity{
         private Canvas  vCanvas;
         private Path    vPath;
         private Paint  vPaint;
-
+       
         float oldX;
         float newX;
         float oldY;
@@ -84,14 +84,13 @@ public class MainActivity extends Activity{
             vPaint.setColor(Color.MAGENTA);
 			vPaint.setStyle(Paint.Style.STROKE);
 			vPaint.setStrokeWidth(strokeWidth);
-            
+			vPath= new Path();
         }
 
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
             //called only once in initialization
-            System.out.println("calling size changed!");
             vBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             vCanvas = new Canvas(vBitmap);
         }
@@ -100,7 +99,7 @@ public class MainActivity extends Activity{
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(BACKGROUND);
             canvas.drawBitmap(vBitmap, 0, 0, vPaint);
-
+            
         }
         
         
@@ -109,10 +108,15 @@ public class MainActivity extends Activity{
             newY = event.getY();
             if (event.getAction()== MotionEvent.ACTION_DOWN){
                     	//make new starting point
-                oldX=event.getX();
-                oldY=event.getY();
+            	vPath.reset();
+                vPath.moveTo(newX, newY);
                 }
-            vCanvas.drawLine(oldX, oldY, newX, newY, vPaint);
+            else {
+            	//???????!?!
+            	vPath.quadTo(oldX, oldY, newX, newY);
+            }
+            vCanvas.drawPath(vPath, vPaint);
+            
             oldX=newX;
             oldY=newY;
             invalidate();
