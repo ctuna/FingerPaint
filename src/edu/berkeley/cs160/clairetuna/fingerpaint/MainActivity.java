@@ -102,6 +102,9 @@ public class MainActivity extends Activity{
             
         }
         
+        public void clearCanvas(Canvas canvas){
+        	
+        }
         
         public boolean onTouchEvent(MotionEvent event) {
             newX = event.getX();
@@ -113,7 +116,7 @@ public class MainActivity extends Activity{
                 }
             else {
             	//???????!?!
-            	vPath.quadTo(oldX, oldY, newX, newY);
+            	vPath.quadTo(oldX, oldY, (oldX+newX)/2, (oldY+newY)/2);
             }
             vCanvas.drawPath(vPath, vPaint);
             
