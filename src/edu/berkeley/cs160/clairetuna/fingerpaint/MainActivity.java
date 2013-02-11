@@ -20,7 +20,7 @@ public class MainActivity extends Activity{
 	MainView drawView;
 	Paint mPaint;
 	Button vButton;
-	
+	LinearLayout canvasContainer;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,7 +37,7 @@ public class MainActivity extends Activity{
 		
 		System.out.println("1 checkpoint");
 		drawView = new MainView(this);
-		LinearLayout canvasContainer = (LinearLayout) findViewById(R.id.canvas);
+		canvasContainer = (LinearLayout) findViewById(R.id.canvas);
 		System.out.println("2 checkpoint");
 
 		canvasContainer.addView(drawView);
@@ -53,7 +53,7 @@ public class MainActivity extends Activity{
 	
 	View.OnClickListener eraseListener = new View.OnClickListener(){
 		public void onClick(View v){
-			
+			drawView.clearCanvas();
 		}
 	};
 	
