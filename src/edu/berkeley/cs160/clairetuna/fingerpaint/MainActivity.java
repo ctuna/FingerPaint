@@ -1,22 +1,25 @@
 package edu.berkeley.cs160.clairetuna.fingerpaint;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Path;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MotionEvent;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.os.Bundle;
+import android.util.AttributeSet;
+import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 public class MainActivity extends Activity{
 	
-	MainView view;
+	MainView drawView;
 	Paint mPaint;
-	
+	Button vButton;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,25 +33,32 @@ public class MainActivity extends Activity{
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(12);
-		view = new MainView(this);
-	    setContentView(view);
+		setContentView(R.layout.activity_main);	
+		
+		System.out.println("1 checkpoint");
+		drawView = new MainView(this);
+		LinearLayout canvasContainer = (LinearLayout) findViewById(R.id.canvas);
+		System.out.println("2 checkpoint");
 
-		//
-		Bitmap b = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(b);
+		canvasContainer.addView(drawView);
+		System.out.println("3 checkpoint");
+		Button eraseButton = (Button) findViewById(R.id.button1);
 		
-		
+		eraseButton.setOnClickListener(eraseListener);
+
+	    
+
 	}
 
 	
-
+	View.OnClickListener eraseListener = new View.OnClickListener(){
+		public void onClick(View v){
+			
+		}
+	};
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_main, menu);
-		return true;
-	}
+	
+
 
 	
 
@@ -76,6 +86,16 @@ public class MainActivity extends Activity{
         float newY;
         int strokeWidth;
 
+        
+        public MainView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+            vPaint= new Paint();
+            strokeWidth=4;
+            vPaint.setColor(Color.MAGENTA);
+			vPaint.setStyle(Paint.Style.STROKE);
+			vPaint.setStrokeWidth(strokeWidth);
+			vPath= new Path();
+        }
         public MainView(Context c) {
         	
             super(c);
@@ -85,6 +105,9 @@ public class MainActivity extends Activity{
 			vPaint.setStyle(Paint.Style.STROKE);
 			vPaint.setStrokeWidth(strokeWidth);
 			vPath= new Path();
+		    //Button eraseButton = (Button)findViewById(R.id.erase_button);
+
+			//eraseButton.setOnClickListener(eraseListener);		
         }
 
         @Override
@@ -97,16 +120,19 @@ public class MainActivity extends Activity{
 
         @Override
         protected void onDraw(Canvas canvas) {
+        	System.out.println("on draw");
             canvas.drawColor(BACKGROUND);
             canvas.drawBitmap(vBitmap, 0, 0, vPaint);
             
         }
         
-        public void clearCanvas(Canvas canvas){
-        	
+        public void clearCanvas(){
+        	vCanvas.drawColor(BACKGROUND);
+        	invalidate();
         }
         
         public boolean onTouchEvent(MotionEvent event) {
+        	System.out.println("in touch event");
             newX = event.getX();
             newY = event.getY();
             if (event.getAction()== MotionEvent.ACTION_DOWN){
@@ -126,8 +152,10 @@ public class MainActivity extends Activity{
          return true;   
         }
 
+
     }
-		 
+		
+
 		 
 	}
 
