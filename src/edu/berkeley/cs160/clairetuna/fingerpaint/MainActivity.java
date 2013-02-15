@@ -1,5 +1,6 @@
 package edu.berkeley.cs160.clairetuna.fingerpaint;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,17 +8,18 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.ArcShape;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 
 public class MainActivity extends Activity{
 	
@@ -26,20 +28,10 @@ public class MainActivity extends Activity{
 	Button vButton;
 	LinearLayout canvasContainer;
 	FrameLayout paintContainer;
-	
-	View redOrangeButton;
-	View redButton;
-	View redVioletButton;
-	View violetButton;
-	View blueVioletButton;
-	View blueButton;
-	View blueGreenButton;
-	View greenButton;
-	View yellowGreenButton;
-	View yellowButton;
-	View yellowOrangeButton;
-	View orangeButton;
-	
+	Preview fingerprintPreview;
+	RelativeLayout fingerprintContainer;
+	Drawable brush;
+	ColorWheel colorWheel;
 	int conversionFactor=20;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,62 +47,64 @@ public class MainActivity extends Activity{
         mPaint.setStrokeWidth(12);
 		setContentView(R.layout.activity_main);	
 		
-		System.out.println("1 checkpoint");
-		drawView = new MainView(this);
 		canvasContainer = (LinearLayout) findViewById(R.id.canvas);
 		paintContainer = (FrameLayout) findViewById(R.id.pie);
-		ColorWheel colorWheel = new ColorWheel(this);
-		paintContainer.addView(colorWheel);
-		System.out.println("2 checkpoint");
-
+		fingerprintContainer = (RelativeLayout) findViewById(R.id.fingerprint_container);
+		
+		drawView = new MainView(this);
+		fingerprintPreview = new Preview(this);
+		colorWheel = new ColorWheel(this, drawView, fingerprintPreview);
+		
 		canvasContainer.addView(drawView);
+		paintContainer.addView(colorWheel);
+		fingerprintContainer.addView(fingerprintPreview);
+		fingerprintContainer.setGravity(Gravity.BOTTOM);
+		fingerprintContainer.setVerticalGravity (Gravity.BOTTOM);
+		
+		SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar1);
+		seekBar.setOnSeekBarChangeListener(seekBarListener);
+		
+
+		
 		
 		
 		//get buttons
 		Button eraseButton = (Button) findViewById(R.id.button1);
-
-		redButton = (View) findViewById(R.id.red_button);
+		Button undoButton = (Button) findViewById(R.id.undo);
 		//left quadrant
 
-		redOrangeButton = (View) findViewById(R.id.red_orange_button);
 
-		
-		/**
-		redButton = (View) findViewById(R.id.red_button);
-		setMargins(redButton, 2, 2);
-		redVioletButton = (View) findViewById(R.id.red_violet_button);
-		setMargins(redVioletButton, 4.5, .5);
-		
-		
-		//right top quadrant
-		violetButton = (View) findViewById(R.id.violet_button);
-		setMargins(violetButton, 7.5, .5);
-		blueVioletButton = (View) findViewById(R.id.blue_violet_button);
-		setMargins(blueVioletButton, 9.5, 2);
-		blueButton = (View) findViewById(R.id.blue_button);
-		setMargins(blueButton, 11.5, 4.5);
-		blueGreenButton = (View) findViewById(R.id.blue_green_button);
-		setMargins(blueGreenButton, 11.5, 7.5);
-		greenButton = (View) findViewById(R.id.green_button);
-		setMargins(greenButton, 9, 10);
-		yellowGreenButton = (View) findViewById(R.id.yellow_green_button);
-		setMargins(yellowGreenButton, 7.5, 11.5);
-		yellowButton = (View) findViewById(R.id.yellow_button);
-		setMargins(yellowButton, 4.5, 11.5);
-		yellowOrangeButton = (View) findViewById(R.id.yellow_orange_button);
-		setMargins(yellowOrangeButton, 2, 10);
-		
-		
-		
-		
-		orangeButton = (View) findViewById(R.id.orange_button);
-		setMargins(orangeButton, .5, 7.5);*/
+
 		//set button listeners
 		eraseButton.setOnClickListener(eraseListener);
-		redButton.setOnClickListener(redButtonListener);
-		redOrangeButton.setOnClickListener(redButtonListener);
+		undoButton.setOnClickListener(undoButtonListener);
 	}
 
+	
+	SeekBar.OnSeekBarChangeListener seekBarListener = new SeekBar.OnSeekBarChangeListener(){
+
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			drawView.setStrokeWidth(progress);
+			System.out.println(progress);
+			fingerprintPreview.setFingerPrintSize(progress+1);
+			
+			//TODO: reflect change
+		}
+
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+			//
+			
+		}
+
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			// 
+			
+		}
+	};
+	
 	public void setMargins(View button, double marginLeft, double marginTop){
 		
 		 
@@ -130,11 +124,14 @@ public class MainActivity extends Activity{
 			drawView.clearCanvas();
 		}
 	};
-	View.OnClickListener redButtonListener = new View.OnClickListener(){
+	
+	
+	View.OnClickListener undoButtonListener = new View.OnClickListener(){
 		public void onClick(View v){
-			drawView.setColor(Color.RED);
+			drawView.undo();
 		}
-	};	
+	};
+
 	
 
 
@@ -157,20 +154,27 @@ public class MainActivity extends Activity{
         private Canvas  vCanvas;
         private Path    vPath;
         private Paint  vPaint;
-       
+        private Canvas lastCanvas;
+        private Bitmap lastBitmap;
+        
         float oldX;
         float newX;
         float oldY;
         float newY;
         int strokeWidth;
-
+        ArrayList<Path> paths;
+        public void setStrokeWidth(int newWidth){
+        	this.strokeWidth=newWidth;
+        	vPaint.setStrokeWidth(strokeWidth);
+        	
+        }
         
         public MainView(Context context, AttributeSet attrs) {
             super(context, attrs);
             vPaint= new Paint();
-            strokeWidth=4;
+            //strokeWidth=4;
             vPaint.setColor(Color.MAGENTA);
-			vPaint.setStyle(Paint.Style.STROKE);
+			vPaint.setStyle(Paint.Style.FILL);
 			vPaint.setStrokeWidth(strokeWidth);
 			vPath= new Path();
         }
@@ -179,7 +183,7 @@ public class MainActivity extends Activity{
         	
             super(c);
             vPaint= new Paint();
-            strokeWidth=4;
+            //strokeWidth=50;
             vPaint.setColor(Color.MAGENTA);
 			vPaint.setStyle(Paint.Style.STROKE);
 			vPaint.setStrokeWidth(strokeWidth);
@@ -199,11 +203,12 @@ public class MainActivity extends Activity{
             //called only once in initialization
             vBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             vCanvas = new Canvas(vBitmap);
+            strokeWidth=10;
+            
         }
 
         @Override
         protected void onDraw(Canvas canvas) {
-        	System.out.println("on draw");
             canvas.drawColor(BACKGROUND);
             canvas.drawBitmap(vBitmap, 0, 0, vPaint);
             
@@ -214,12 +219,33 @@ public class MainActivity extends Activity{
         	invalidate();
         }
         
+        public void onClickUndo () { 
+            if (paths.size()>0) { 
+               undonePaths.add(paths.remove(paths.size()-1))
+               invalidate();
+             }
+            else
+             //toast the user 
+        }
+        
+        public void onClickRedo (){
+        	   if (undonePaths.size()>0) { 
+        	       paths.add(undonePaths.remove(undonePaths.size()-1)) 
+        	       invalidate();
+        	   } 
+        	   else 
+        	     //toast the user 
+        	}
+        
+        
         public boolean onTouchEvent(MotionEvent event) {
         	System.out.println("in touch event");
             newX = event.getX();
             newY = event.getY();
             if (event.getAction()== MotionEvent.ACTION_DOWN){
                     	//make new starting point
+            	System.out.println("down action");
+            	lastBitmap=vBitmap;
             	vPath.reset();
                 vPath.moveTo(newX, newY);
                 }
