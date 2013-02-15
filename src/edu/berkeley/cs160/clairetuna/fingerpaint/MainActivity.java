@@ -1,6 +1,8 @@
 package edu.berkeley.cs160.clairetuna.fingerpaint;
 
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -20,9 +22,10 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 public class MainActivity extends Activity{
-	
+
 	MainView drawView;
 	Paint mPaint;
 	Button vButton;
@@ -46,31 +49,32 @@ public class MainActivity extends Activity{
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(12);
 		setContentView(R.layout.activity_main);	
-		
+
 		canvasContainer = (LinearLayout) findViewById(R.id.canvas);
 		paintContainer = (FrameLayout) findViewById(R.id.pie);
 		fingerprintContainer = (RelativeLayout) findViewById(R.id.fingerprint_container);
-		
+
 		drawView = new MainView(this);
 		fingerprintPreview = new Preview(this);
 		colorWheel = new ColorWheel(this, drawView, fingerprintPreview);
-		
+
 		canvasContainer.addView(drawView);
 		paintContainer.addView(colorWheel);
 		fingerprintContainer.addView(fingerprintPreview);
 		fingerprintContainer.setGravity(Gravity.BOTTOM);
 		fingerprintContainer.setVerticalGravity (Gravity.BOTTOM);
-		
+
 		SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar1);
 		seekBar.setOnSeekBarChangeListener(seekBarListener);
-		
 
-		
-		
-		
+
+
+
+
 		//get buttons
 		Button eraseButton = (Button) findViewById(R.id.button1);
 		Button undoButton = (Button) findViewById(R.id.undo);
+		Button redoButton = (Button) findViewById(R.id.redo);
 		//left quadrant
 
 
@@ -80,7 +84,7 @@ public class MainActivity extends Activity{
 		undoButton.setOnClickListener(undoButtonListener);
 	}
 
-	
+
 	SeekBar.OnSeekBarChangeListener seekBarListener = new SeekBar.OnSeekBarChangeListener(){
 
 		@Override
@@ -88,26 +92,26 @@ public class MainActivity extends Activity{
 			drawView.setStrokeWidth(progress);
 			System.out.println(progress);
 			fingerprintPreview.setFingerPrintSize(progress+1);
-			
+
 			//TODO: reflect change
 		}
 
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {
 			//
-			
+
 		}
 
 		@Override
 		public void onStopTrackingTouch(SeekBar seekBar) {
 			// 
-			
+
 		}
 	};
-	
+
 	public void setMargins(View button, double marginLeft, double marginTop){
-		
-		 
+
+
 		    MarginLayoutParams marginParams = new MarginLayoutParams(button.getLayoutParams());
 
 			int intMarginLeft = (int)Math.round(marginLeft)*conversionFactor;
@@ -115,27 +119,35 @@ public class MainActivity extends Activity{
 		    marginParams.setMargins(intMarginLeft, intMarginTop, 0, 0);
 		    FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(marginParams);
 		    button.setLayoutParams(layoutParams);
-		
-		
+
+
 	}
-	
+
 	View.OnClickListener eraseListener = new View.OnClickListener(){
 		public void onClick(View v){
 			drawView.clearCanvas();
 		}
 	};
-	
-	
+
+
 	View.OnClickListener undoButtonListener = new View.OnClickListener(){
 		public void onClick(View v){
 			drawView.undo();
+		
 		}
 	};
 
 	
+	View.OnClickListener redoButtonListener = new View.OnClickListener(){
+		public void onClick(View v){
+			drawView.redo();
+		
+		}
+	};
 
 
-	
+
+
 
 
 
@@ -162,7 +174,11 @@ public class MainActivity extends Activity{
         float oldY;
         float newY;
         int strokeWidth;
-        ArrayList<Path> paths;
+        ArrayList<Path> paths= new ArrayList<Path>();
+        ArrayList<Paint> paints = new ArrayList<Paint>();
+        ArrayList<Path> undonePaths= new ArrayList<Path>();
+        ArrayList<Paint> undonePaints = new ArrayList<Paint>();
+        
         public void setStrokeWidth(int newWidth){
         	this.strokeWidth=newWidth;
         	vPaint.setStrokeWidth(strokeWidth);
@@ -184,7 +200,7 @@ public class MainActivity extends Activity{
             super(c);
             vPaint= new Paint();
             //strokeWidth=50;
-            vPaint.setColor(Color.MAGENTA);
+            //vPaint.setColor(Color.MAGENTA);
 			vPaint.setStyle(Paint.Style.STROKE);
 			vPaint.setStrokeWidth(strokeWidth);
 			vPath= new Path();
@@ -210,7 +226,7 @@ public class MainActivity extends Activity{
         @Override
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(BACKGROUND);
-            canvas.drawBitmap(vBitmap, 0, 0, vPaint);
+            canvas.drawBitmap(vBitmap, 0, 0, null);
             
         }
         
@@ -218,42 +234,90 @@ public class MainActivity extends Activity{
         	vCanvas.drawColor(BACKGROUND);
         	invalidate();
         }
-        
-        public void onClickUndo () { 
-            if (paths.size()>0) { 
-               undonePaths.add(paths.remove(paths.size()-1))
-               invalidate();
-             }
-            else
-             //toast the user 
+
+        public void undo(){  
+        	System.out.println("total paths is: "+ paths.size());
+        	if (paths.size()>0){
+        		System.out.println("here in undo");
+        	vCanvas.drawColor(BACKGROUND);
+        	undonePaths.add(paths.remove(paths.size()-1));
+        	undonePaints.add(paints.remove(paints.size()-1));
+        	Paint currentPaint;
+        	        for (int i = 0; i < paths.size();i++){
+        	        	currentPaint = paints.get(i);
+        	            vCanvas.drawPath(paths.get(i), currentPaint);
+        	        }
+        	        invalidate();
+        	}
+        	else {        		        		
+        		Context context = getApplicationContext();
+        		CharSequence text = "There is no paint left to erase";
+        		int duration = Toast.LENGTH_SHORT;
+        		Toast toast = Toast.makeText(context, text, duration);
+        		toast.show();
+        	}
+        	
         }
         
-        public void onClickRedo (){
+        public void redo (){
+        	System.out.println("chk0");
         	   if (undonePaths.size()>0) { 
-        	       paths.add(undonePaths.remove(undonePaths.size()-1)) 
-        	       invalidate();
-        	   } 
-        	   else 
+        		   System.out.println("ckpt1");
+        	       paths.add(undonePaths.remove(undonePaths.size()-1)); 
+        	       paints.add(undonePaints.remove(undonePaints.size()-1)); 
+        	       if (paths.size()>0){
+        	    	   
+               		vCanvas.drawColor(BACKGROUND);
+               		Paint currentPaint;
+               	        for (int i = 0; i < paths.size();i++){
+               	        	System.out.println("inside redo");
+               	        	currentPaint = paints.get(i);
+               	            vCanvas.drawPath(paths.get(i), currentPaint);
+               	        }
+               	        
+        	       }invalidate();
+        	   }
+        	   
+        	   else {
+        		Context context = getApplicationContext();
+           		CharSequence text = "Nothing left to redo";
+           		int duration = Toast.LENGTH_SHORT;
+           		Toast toast = Toast.makeText(context, text, duration);
+           		toast.show();
+        	   }
         	     //toast the user 
         	}
         
         
         public boolean onTouchEvent(MotionEvent event) {
         	System.out.println("in touch event");
+        	
+        	
             newX = event.getX();
             newY = event.getY();
             if (event.getAction()== MotionEvent.ACTION_DOWN){
-                    	//make new starting point
-            	System.out.println("down action");
+            	
+                
+               
             	lastBitmap=vBitmap;
             	vPath.reset();
                 vPath.moveTo(newX, newY);
+                vCanvas.drawPath(vPath, vPaint);
+                
                 }
-            else {
-            	//???????!?!
-            	vPath.quadTo(oldX, oldY, (oldX+newX)/2, (oldY+newY)/2);
+            else if (event.getAction()== MotionEvent.ACTION_UP){
+            	paths.add(vPath);
+            	paints.add(new Paint(vPaint));
+            	vPath = new Path();
+            	
+            	
             }
-            vCanvas.drawPath(vPath, vPaint);
+            else {
+            	
+            	vPath.quadTo(oldX, oldY, (oldX+newX)/2, (oldY+newY)/2);
+            	vCanvas.drawPath(vPath, vPaint);
+            }
+            
             
             oldX=newX;
             oldY=newY;
@@ -263,11 +327,9 @@ public class MainActivity extends Activity{
 
 
     }
-		
 
-		
-	
-	
+
+
+
+
 	}
-
-
