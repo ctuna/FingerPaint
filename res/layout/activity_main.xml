@@ -33,6 +33,37 @@
         
         </FrameLayout>
 
+
+	    
+	        <View
+        android:layout_width="20dp"
+        android:layout_height="fill_parent"/>
+      	<LinearLayout
+       android:layout_width="40dp"
+       android:layout_height="fill_parent"
+       android:layout_gravity="bottom"
+       android:orientation="vertical" >
+       <View
+        android:layout_width="10dp"
+        android:layout_height="10dp"/>  
+ 	      <Button
+          android:layout_width="40dp"
+          android:layout_height="40dp"
+          android:background="@drawable/white_button"
+          android:id="@+id/whiteButton"/>   
+              <View
+        android:layout_width="10dp"
+        android:layout_height="20dp"/>   
+	      <Button
+          android:layout_width="40dp"
+          android:layout_height="40dp"
+          android:background="@drawable/black_button"
+          android:id="@+id/blackButton"/>
+      </LinearLayout>       
+          <View
+        android:layout_width="20dp"
+        android:layout_height="fill_parent"/>
+      	
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="100dp"
@@ -40,11 +71,14 @@
         
         />
 
-  
-      
 
+
+    
+    
+
+        
+        
         <LinearLayout
-            android:paddingLeft="20dp"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="bottom"
@@ -55,7 +89,7 @@
             <RelativeLayout
                 android:id="@+id/fingerprint_container"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                  ></RelativeLayout>
             
            
@@ -63,7 +97,6 @@
         android:id="@+id/seekBar1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        
   	
   		android:max="100" />
             

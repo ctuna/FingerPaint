@@ -1,6 +1,10 @@
 package edu.berkeley.cs160.clairetuna.fingerpaint;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,13 +12,16 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.Menu;
@@ -46,7 +53,7 @@ public class MainActivity extends Activity{
 
 
 	
-	
+	String filePath;
 	
 	HashMap<String, Object> map;
 	ArrayList<HashMap> spinnerList= new ArrayList<HashMap>();
@@ -60,6 +67,8 @@ public class MainActivity extends Activity{
 	Drawable brush;
 	ColorWheel colorWheel;
 	int conversionFactor=20;
+	Button blackButton;
+	Button whiteButton;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,11 +79,14 @@ public class MainActivity extends Activity{
 		canvasContainer = (LinearLayout) findViewById(R.id.canvas);
 		paintContainer = (FrameLayout) findViewById(R.id.pie);
 		fingerprintContainer = (RelativeLayout) findViewById(R.id.fingerprint_container);
-
+		
 		drawView = new MainView(this);
 		fingerprintPreview = new Preview(this);
 		colorWheel = new ColorWheel(this, drawView, fingerprintPreview);
-
+		blackButton= (Button) findViewById(R.id.blackButton);
+		whiteButton= (Button) findViewById(R.id.whiteButton);
+		blackButton.setOnClickListener(blackButtonListener);
+		whiteButton.setOnClickListener(whiteButtonListener);
 		canvasContainer.addView(drawView);
 		paintContainer.addView(colorWheel);
 		fingerprintContainer.addView(fingerprintPreview);
@@ -87,7 +99,19 @@ public class MainActivity extends Activity{
 
 	    }
 
-
+	View.OnClickListener blackButtonListener = new View.OnClickListener(){
+		
+		public void onClick(View v){
+			drawView.setColor(Color.BLACK);	
+			fingerprintPreview.setFingerPrintColor(Color.BLACK);
+		}
+	};
+	View.OnClickListener whiteButtonListener = new View.OnClickListener(){
+		public void onClick(View v){
+			drawView.setColor(Color.WHITE);	
+			fingerprintPreview.setFingerPrintColor(Color.WHITE);
+		}
+	};
 	public void instantiateSpinner(){
 		
 	
@@ -99,6 +123,11 @@ public class MainActivity extends Activity{
         map.put("Name", "doodle");
         map.put("Icon", R.drawable.doodle);
         list.add(map);
+        map = new HashMap<String, Object>();
+        map.put("Name", "line");
+        map.put("Icon", R.drawable.line);
+        list.add(map);
+        
         map = new HashMap<String, Object>();
         map.put("Name", "square");
         map.put("Icon", R.drawable.square);
@@ -172,6 +201,11 @@ public class MainActivity extends Activity{
 	            	.setImageResource(R.drawable.doodle);
 	            	
 	            }
+	            if (data.get("Name").equals("line")){
+	            	((ImageView) convertView.findViewById(R.id.icon))
+	            	.setImageResource(R.drawable.line);
+	            	
+	            }
 
 	            
 
@@ -186,20 +220,25 @@ public class MainActivity extends Activity{
 	        public void onItemSelected(AdapterView<?> parent, View view, 
 	                int pos, long id) {
 	        	switch(pos){
-	        		case(1):
-	        			drawView.setMode("rectangleStroke");
-	        			break;
-	        		case (2):
-	        			drawView.setMode("rectangleFill");
-	        			break;
-	        		case (3):
-	        			drawView.setMode("circleStroke");
-	        			break;	
-	        		case (4):
-	        			drawView.setMode("circleFill");
-	        			break;
 	        		case (0):
 	        			drawView.setMode("scribble");
+	        			break;
+	        		case(1):
+	        			drawView.setMode("line");
+	        			break;
+	        		case(2):
+	        			drawView.setMode("rectangleStroke");
+        				break;
+	        		case (3):
+	        			drawView.setMode("rectangleFill");
+	        			break;
+	        		case (4):
+	        			drawView.setMode("circleStroke");
+	        			break;	
+	        		case (5):
+	        			drawView.setMode("circleFill");
+	        			break;
+	        		
 	        		
 	        	}
 	            // An item was selected. You can retrieve the selected item using
@@ -220,7 +259,7 @@ public class MainActivity extends Activity{
 			
 			drawView.setStrokeWidth(progress+20);
 			fingerprintPreview.setStrokeLevel(progress);
-			//TODO: reflect change
+			
 		}
 
 		@Override
@@ -270,14 +309,13 @@ public class MainActivity extends Activity{
 
 
 	public boolean onCreateOptionsMenu(Menu menu) {
-		System.out.println("got to oncreateopt");
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_main, menu);
 	   return true;
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
-		System.out.println("got to on options");
+		
 	      switch (item.getItemId()) {
 	      case R.id.undo:
 	    	   drawView.undo();
@@ -291,7 +329,7 @@ public class MainActivity extends Activity{
 	            return true;
 	    
 	      case R.id.menu_item_share:
-	    	  /**Boolean aSuccess = saveBitmap();
+	    	  Boolean aSuccess = saveBitmap();
 	    	  	if (aSuccess) {
 	    	  		Intent share = new Intent(Intent.ACTION_SEND);
 	                share.setType("image/jpeg");
@@ -300,34 +338,36 @@ public class MainActivity extends Activity{
 	    	  	} else {
 	    	  		Toast.makeText(this, "There was a problem saving the image.",
 	                        Toast.LENGTH_SHORT).show();
-	    	  	}*/
+	    	  	}
 	            return true; 
 	      case R.id.menu_item_save:
-	    	  	/**Boolean bSuccess = saveBitmap();
+	    	  	Boolean bSuccess = saveBitmap();
 	    	  	if (bSuccess) {
-	    	  		Toast.makeText(this, "Image saved successfully.",
+	    	  		Toast.makeText(this, "Image saved as Painting"+currentFileIndex+".jpg",
 	                        Toast.LENGTH_SHORT).show();
 	    	  	} else {
 	    	  		Toast.makeText(this, "There was a problem saving the image.",
 	                        Toast.LENGTH_SHORT).show();
-	    	  	}*/
+	    	  	}
 	    	  	return true;
 	      default:
 	            return super.onOptionsItemSelected(item);
 	      }
 	}
 
-	/**private Boolean saveBitmap() {
+	private Boolean saveBitmap() {
 
 	    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-	    Bitmap currentBitmap = mCustomView.getBitmap();
+	    Bitmap currentBitmap = drawView.getBitmap();
 	    currentBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
 
+
 	    //will create "test.jpg" in sdcard folder.
-	    File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + "test.jpg");
+	    File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + "Painting"+currentFileIndex+".jpg");
 
 	    try {
 			f.createNewFile();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -346,12 +386,13 @@ public class MainActivity extends Activity{
 			return false;
 		}
 
-		filePath = f.getAbsolutePath();
+		 filePath = f.getAbsolutePath();
+		 currentFileIndex++;
 		return true;
 
-	}*/
+	}
 
-
+	int currentFileIndex=0;
 
 
 	enum PaintMode {
@@ -397,6 +438,9 @@ public class MainActivity extends Activity{
         	
             super(c);
 			vPath= new Path();
+        }
+        public Bitmap getBitmap(){
+        	return vBitmap;
         }
         public void initializePaint(){
         	strokeWidth=30;
@@ -474,7 +518,6 @@ public class MainActivity extends Activity{
         
         public void redo (){
         	   if (undonePaths.size()>0) { 
-        		   System.out.println("ckpt1");
         	       paths.add(undonePaths.remove(undonePaths.size()-1)); 
         	       paints.add(undonePaints.remove(undonePaints.size()-1)); 
         	       if (paths.size()>0){
@@ -482,7 +525,6 @@ public class MainActivity extends Activity{
                		vCanvas.drawColor(BACKGROUND);
                		Paint currentPaint;
                	        for (int i = 0; i < paths.size();i++){
-               	        	System.out.println("inside redo");
                	        	currentPaint = paints.get(i);
                	            vCanvas.drawPath(paths.get(i), currentPaint);
                	        }
@@ -507,8 +549,6 @@ public class MainActivity extends Activity{
         	
             newX = event.getX();
             newY = event.getY();
-            
-            System.out.println("X IS :"+ newX + " Y IS: " + newY);
             float dX;
             float dY;
             dX=newX-startX;
@@ -570,8 +610,16 @@ public class MainActivity extends Activity{
             		vPath.reset();
             		vPath.addCircle(centerX, centerY, radius, Path.Direction.CCW);
             		
-            		
             	}  
+            	else if (mode.equals("line")){
+            		           		
+      				undo();
+            		vPath= new Path();
+            		vPath.moveTo(startX, startY);
+            		vPath.lineTo(newX, newY);
+            		
+      		   		vCanvas.drawLine(startX, startY, newX, newY, vPaint);
+        	}
             	else if (mode.equals("scribble")){
             	
             	
@@ -634,6 +682,20 @@ public class MainActivity extends Activity{
           		   		paints.add(new Paint(vPaint));
                 		
                 	} 
+                	else if (mode.equals("line")){
+                		
+                    		if (!newShape){
+              				   undo();
+              			   }
+              			    newShape=false;
+                    		vPath= new Path();
+                    		vPath.moveTo(startX, startY);
+                    		vPath.lineTo(newX, newY);
+                    		paths.add(vPath);
+              		   		paints.add(new Paint(vPaint));
+              		   		vCanvas.drawLine(startX, startY, newX, newY, vPaint);
+                	}
+                	
                 else if (mode.equals("scribble")){
              	vPath.quadTo(oldX, oldY, (oldX+newX)/2, (oldY+newY)/2);
              	vCanvas.drawPath(vPath, vPaint);

@@ -6,7 +6,7 @@
     		android:width="40dp"
     		android:height="40dp" >
             <solid
-                android:color="@color/RedOrange"
+                android:color="@android:color/white"
                  />
           
         </shape>
@@ -21,7 +21,7 @@
 
         android:type="radial"
             android:startColor="@color/White"
-            android:endColor="@color/RedOrange"
+            android:endColor="#d2d1d1"
             android:gradientRadius="50"
             android:angle="270"
             android:centerX="0"

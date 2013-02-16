@@ -36,6 +36,7 @@ public class Preview extends View{
     private Canvas  vCanvas;
     private Path    vPath;
     private Paint  vPaint;
+    private Paint whitePaint;
     Bitmap currentFingerprint;
     Bitmap originalFingerprint;
     int originalHeight = 150;
@@ -86,6 +87,8 @@ public class Preview extends View{
         vPaint.setColor(Color.BLACK);
 		vPaint.setStyle(Paint.Style.STROKE);
 		vPaint.setStrokeWidth(30);
+		whitePaint=new Paint();
+		whitePaint.setColor(Color.WHITE);
     }
 @Override
 	public void onLayout(boolean bo, int a , int b, int c, int d ){
@@ -93,7 +96,6 @@ public class Preview extends View{
 
         centerCoordinates = new int[2];
         this.getLocationOnScreen(centerCoordinates);
-        System.out.println("X is: " +centerCoordinates[0] + "Y is: " + centerCoordinates[1]);
         invalidate();
 }
     public void setStrokeLevel(int size){
@@ -117,7 +119,9 @@ public class Preview extends View{
     	res = getResources();
     	//TODO: make paint
     	vPaint.setStyle(Paint.Style.FILL);
-    	canvas.drawCircle(150, 100, radius,  vPaint);
+    	canvas.drawCircle(110, 100, radius+ 3, whitePaint);
+    	canvas.drawCircle(110, 100, radius,  vPaint);
+    	
         
     }
     
