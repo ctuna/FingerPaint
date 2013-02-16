@@ -1,24 +1,20 @@
 package edu.berkeley.cs160.clairetuna.fingerpaint;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.Menu;
@@ -26,16 +22,34 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
+
+
+
+
+
 
 public class MainActivity extends Activity{
 
+
+
+
+	
+	
+	
+	HashMap<String, Object> map;
+	ArrayList<HashMap> spinnerList= new ArrayList<HashMap>();
 	MainView drawView;
 	Paint mPaint;
 	Button vButton;
@@ -50,14 +64,7 @@ public class MainActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//set view to our Mainview
-		mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
-        mPaint.setColor(0xFFFF0000);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(12);
+
 		setContentView(R.layout.activity_main);	
 
 		canvasContainer = (LinearLayout) findViewById(R.id.canvas);
@@ -73,35 +80,146 @@ public class MainActivity extends Activity{
 		fingerprintContainer.addView(fingerprintPreview);
 		fingerprintContainer.setGravity(Gravity.BOTTOM);
 		fingerprintContainer.setVerticalGravity (Gravity.BOTTOM);
-
+		drawView.setMode("scribble");
 		SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar1);
 		seekBar.setOnSeekBarChangeListener(seekBarListener);
+		instantiateSpinner();
+
+	    }
 
 
+	public void instantiateSpinner(){
+		
+	
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+  
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        
+        map.put("Name", "doodle");
+        map.put("Icon", R.drawable.doodle);
+        list.add(map);
+        map = new HashMap<String, Object>();
+        map.put("Name", "square");
+        map.put("Icon", R.drawable.square);
+        list.add(map);
+        
+        map = new HashMap<String, Object>();
+        map.put("Name", "square_filled");
+        map.put("Icon", R.drawable.square_filled);
+        list.add(map);
+
+        map = new HashMap<String, Object>();
+        map.put("Name", "circle");
+        map.put("Icon", R.drawable.circle);
+        list.add(map);
+        
+        map = new HashMap<String, Object>();
+        map.put("Name", "circle_filled");
+        map.put("Icon", R.drawable.circle_filled);
+        list.add(map);
+        
 
 
+        
+        Spinner spin = (Spinner) findViewById(R.id.spinner);
+        myAdapter adapter = new myAdapter(getApplicationContext(), list,
+                R.layout.row, new String[] { "Name", "Icon" },
+                new int[] { R.id.name, R.id.icon });
 
-		//get buttons
-		Button toolButton = (Button) findViewById(R.id.tools);
-		//left quadrant
-
-
-
-		//set button listeners
-		//undoButton.setOnClickListener(undoButtonListener);
-		//redoButton.setOnClickListener(redoButtonListener);
-		toolButton.setOnClickListener(toolButtonListener);
+        spin.setAdapter(adapter);
+        spin.setOnItemSelectedListener(spinnerListener);
+        
 	}
 
+	    private class myAdapter extends SimpleAdapter {
 
+	        public myAdapter(Context context, List<? extends Map<String, ?>> data,
+	                int resource, String[] from, int[] to) {
+	            super(context, data, resource, from, to);
+
+	        }
+
+	        @Override
+	        public View getView(int position, View convertView, ViewGroup parent) {
+
+	            if (convertView == null) {
+	                convertView = getLayoutInflater().inflate(R.layout.row,
+	                        null);
+	            }
+
+	            HashMap<String, Object> data = (HashMap<String, Object>) getItem(position);
+	        
+	            if (data.get("Name").equals("square")){
+	            	((ImageView) convertView.findViewById(R.id.icon))
+                    .setImageResource(R.drawable.square);
+	            }
+	            if (data.get("Name").equals("square_filled")){
+	            	((ImageView) convertView.findViewById(R.id.icon))
+                    .setImageResource(R.drawable.square_filled);
+	            }
+	            if (data.get("Name").equals("circle")){
+	            	((ImageView) convertView.findViewById(R.id.icon))
+                    .setImageResource(R.drawable.circle);
+	            }
+	            if (data.get("Name").equals("circle_filled")){
+	            	((ImageView) convertView.findViewById(R.id.icon))
+                    .setImageResource(R.drawable.circle_filled);
+	            	
+	            }
+	            if (data.get("Name").equals("doodle")){
+	            	((ImageView) convertView.findViewById(R.id.icon))
+	            	.setImageResource(R.drawable.doodle);
+	            	
+	            }
+
+	            
+
+	            return convertView;
+	        }
+	    }
+
+	
+
+	    AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
+	   
+	        public void onItemSelected(AdapterView<?> parent, View view, 
+	                int pos, long id) {
+	        	switch(pos){
+	        		case(1):
+	        			drawView.setMode("rectangleStroke");
+	        			break;
+	        		case (2):
+	        			drawView.setMode("rectangleFill");
+	        			break;
+	        		case (3):
+	        			drawView.setMode("circleStroke");
+	        			break;	
+	        		case (4):
+	        			drawView.setMode("circleFill");
+	        			break;
+	        		case (0):
+	        			drawView.setMode("scribble");
+	        		
+	        	}
+	            // An item was selected. You can retrieve the selected item using
+	            // parent.getItemAtPosition(pos)
+	        }
+
+	        public void onNothingSelected(AdapterView<?> parent) {
+	            // Another interface callback
+	        }
+	    };
+	    
+	    
+	    
 	SeekBar.OnSeekBarChangeListener seekBarListener = new SeekBar.OnSeekBarChangeListener(){
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			drawView.setStrokeWidth(progress);
-			System.out.println(progress);
-			fingerprintPreview.setFingerPrintSize(progress+1);
-
+			
+			drawView.setStrokeWidth(progress+20);
+			fingerprintPreview.setStrokeLevel(progress);
 			//TODO: reflect change
 		}
 
@@ -142,10 +260,9 @@ public class MainActivity extends Activity{
 	View.OnClickListener toolButtonListener = new View.OnClickListener(){
 		public void onClick(View v){
 			
-				Intent intent = new Intent(MainActivity.this, Tools.class);
 				//intent.putExtra("COST_OF_DINNER_MESSAGE", costString);
 				//TODO: add current paint info
-				startActivity(intent);
+			
 			}
 			
 			
@@ -252,8 +369,6 @@ public class MainActivity extends Activity{
         private Canvas  vCanvas;
         private Path    vPath;
         private Paint  vPaint;
-        private Canvas lastCanvas;
-        private Bitmap lastBitmap;
         
         float oldX;
         float newX;
@@ -284,17 +399,16 @@ public class MainActivity extends Activity{
 			vPath= new Path();
         }
         public void initializePaint(){
-        	strokeWidth=50;
+        	strokeWidth=30;
             vPaint= new Paint();
 			vPaint.setStrokeWidth(strokeWidth);
-            vPaint.setColor(Color.MAGENTA);
+            vPaint.setColor(Color.BLACK);
 			vPaint.setStyle(Paint.Style.STROKE);
 			vPaint.setStrokeWidth(strokeWidth);
 			vPaint.setStrokeCap(Paint.Cap.ROUND);
 			vPaint.setAntiAlias(true);
 			erasePaint = new Paint();
 			erasePaint.setStrokeWidth(500);
-			System.out.println("full glorious width is: "+ getWidth());
 			erasePaint.setColor(Color.WHITE);
         }
         public void setColor(int color){
@@ -308,11 +422,15 @@ public class MainActivity extends Activity{
             vBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             vCanvas = new Canvas(vBitmap);
             initializePaint();
-            mode="circleFill";
+            mode="scribble";
             startX=0;
             startY=0;
         }
 
+        
+        public void setMode(String newMode){
+        	mode=newMode;
+        }
         @Override
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(BACKGROUND);
@@ -395,7 +513,9 @@ public class MainActivity extends Activity{
             float dY;
             dX=newX-startX;
     		dY=newY-startY;
-            
+            if (mode.equals("circleStroke") || mode.equals("rectangleStroke")){
+            	vPaint.setStyle(Paint.Style.STROKE);
+            }
 
             if (event.getAction()== MotionEvent.ACTION_DOWN){
             	newShape = true;
@@ -437,6 +557,7 @@ public class MainActivity extends Activity{
 
             	if (mode.equals("circleFill")){
             		vPaint.setStyle(Paint.Style.FILL);}
+            	
             	if (mode.equals("circleFill")|| mode.equals("circleStroke")){
             		undo();     			   
             		float centerX = (startX+newX)/2;

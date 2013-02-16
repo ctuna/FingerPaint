@@ -3,12 +3,13 @@ package edu.berkeley.cs160.clairetuna.fingerpaint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -40,13 +41,14 @@ public class Preview extends View{
     int originalHeight = 150;
     int originalWidth = 150;
     int currentColor;   
-    
+    Drawable stroke;
+    ScaleDrawable strokeScalable;
     float newX;
     float newY;
     int strokeWidth;
     Resources res;
-    
-    
+    int[] centerCoordinates;
+    int radius=25;
     
     
     
@@ -66,81 +68,56 @@ public class Preview extends View{
     public Preview(Context c) {
     	
         super(c);
-        vPaint= new Paint();
-        //strokeWidth=50;
-        vPaint.setColor(Color.MAGENTA);
-		vPaint.setStyle(Paint.Style.STROKE);
-		vPaint.setStrokeWidth(strokeWidth);
-		vPath= new Path();
-	    //Button eraseButton = (Button)findViewById(R.id.erase_button);
 
-		//eraseButton.setOnClickListener(eraseListener);		
+		vPath= new Path();	
     }
 
     
     public void setColor(int color){
     	vPaint.setColor(color);
     }
-    ScaleDrawable fingerprintScaled;
+    
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        //called only once in initialization
         vBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         vCanvas = new Canvas(vBitmap);
-        //set up orignal paint
-        vPaint = new Paint();
-        vPaint.setColor(0xFFFF0000);
-        vPaint.setStyle(Paint.Style.STROKE);
-        //initialize
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inMutable=true;
-    	originalFingerprint = BitmapFactory.decodeResource(getResources(),R.drawable.fingerprint, opts);
-    	currentFingerprint = originalFingerprint.copy(originalFingerprint.getConfig(), true);
-    	currentColor=black;
-    	
-    	
-        //fingerprintScaled.draw(vCanvas);
-        //System.out.println("size change here");
-        strokeWidth=10;
-        setFingerPrintColor(violet);
+        vPaint= new Paint();
+        vPaint.setColor(Color.BLACK);
+		vPaint.setStyle(Paint.Style.STROKE);
+		vPaint.setStrokeWidth(30);
     }
+@Override
+	public void onLayout(boolean bo, int a , int b, int c, int d ){
+		super.onLayout(bo, a, b, c, d);
 
-    
-    public void setFingerPrintSize(int sizePercent){
-    	//createScaledBitmap(Bitmap src, int dstWidth, int dstHeight, boolean filter)
-     	currentFingerprint = Bitmap.createScaledBitmap(originalFingerprint, sizePercent*originalWidth/100, sizePercent*originalHeight/100, false);
-     	setFingerPrintColor(currentColor);
-     	
-    }
-    
-    public void setFingerPrintColor(int currentColor){
-    	
-    	
-    	int [] allpixels = new int [ currentFingerprint.getHeight()*currentFingerprint.getWidth()];
-    	currentFingerprint.getPixels(allpixels, 0, currentFingerprint.getWidth(), 0, 0, currentFingerprint.getWidth(),currentFingerprint.getHeight());
-
-    	for(int i =0; i<currentFingerprint.getHeight()*currentFingerprint.getWidth();i++){
-
-    	 if( allpixels[i] != Color.TRANSPARENT){
-    	             allpixels[i] = currentColor;
-    	 }
-
-    	}
-    	currentFingerprint.setPixels(allpixels, 0, currentFingerprint.getWidth(), 0, 0, currentFingerprint.getWidth(), currentFingerprint.getHeight());
-    	this.currentColor = currentColor;
+        centerCoordinates = new int[2];
+        this.getLocationOnScreen(centerCoordinates);
+        System.out.println("X is: " +centerCoordinates[0] + "Y is: " + centerCoordinates[1]);
+        invalidate();
+}
+    public void setStrokeLevel(int size){
+    	radius = (size+10)/2;
+    	vPaint.setStrokeWidth(size);  
     	invalidate();
     }
     
+    public void setFingerPrintColor(int currentColor){
+    	vPaint.setColor(currentColor);
+    	invalidate();
+    }
+    
+   
+    
+    
+    		
+    
     @Override
     protected void onDraw(Canvas canvas) {
-    	System.out.println("on draw");
     	res = getResources();
     	//TODO: make paint
-    	canvas.drawBitmap (currentFingerprint, new Matrix(), null);
-       
-        
-        //fingerprintScaled.draw(canvas);
+    	vPaint.setStyle(Paint.Style.FILL);
+    	canvas.drawCircle(150, 100, radius,  vPaint);
         
     }
     

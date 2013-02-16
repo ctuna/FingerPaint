@@ -41,38 +41,49 @@ containing a value of this type.
         public static final int RedViolet=0x7f050002;
         public static final int Violet=0x7f050003;
         public static final int White=0x7f05000c;
+        public static final int Wood=0x7f05000e;
         public static final int Yellow=0x7f050009;
         public static final int YellowGreen=0x7f050008;
         public static final int YellowOrange=0x7f05000a;
     }
     public static final class drawable {
-        public static final int fingerprint=0x7f020000;
-        public static final int fingerprint_black=0x7f020001;
-        public static final int fingerprint_scaled=0x7f020002;
-        public static final int ic_launcher=0x7f020003;
-        public static final int palette=0x7f020004;
-        public static final int red_button=0x7f020005;
-        public static final int red_orange_button=0x7f020006;
+        public static final int circle=0x7f020000;
+        public static final int circle_filled=0x7f020001;
+        public static final int doodle=0x7f020002;
+        public static final int doodle_button=0x7f020003;
+        public static final int fingerprint=0x7f020004;
+        public static final int fingerprint_black=0x7f020005;
+        public static final int fingerprint_scaled=0x7f020006;
+        public static final int ic_launcher=0x7f020007;
+        public static final int palette=0x7f020008;
+        public static final int red_button=0x7f020009;
+        public static final int red_orange_button=0x7f02000a;
+        public static final int square=0x7f02000b;
+        public static final int square_filled=0x7f02000c;
+        public static final int stroke=0x7f02000d;
+        public static final int stroke_scalable=0x7f02000e;
     }
     public static final class id {
         public static final int canvas=0x7f040002;
-        public static final int clear=0x7f040009;
-        public static final int colorpicker=0x7f040008;
-        public static final int dicks=0x7f040006;
-        public static final int fingerprint_container=0x7f040007;
+        public static final int clear=0x7f04000a;
+        public static final int colorpicker=0x7f040009;
+        public static final int fingerprint_container=0x7f040005;
+        public static final int icon=0x7f040008;
         public static final int left=0x7f040000;
-        public static final int menu_item_save=0x7f04000d;
-        public static final int menu_item_share=0x7f04000c;
-        public static final int pie=0x7f040004;
-        public static final int redo=0x7f04000b;
+        public static final int menu_item_save=0x7f04000e;
+        public static final int menu_item_share=0x7f04000d;
+        public static final int name=0x7f040007;
+        public static final int pie=0x7f040003;
+        public static final int redo=0x7f04000c;
         public static final int right=0x7f040001;
-        public static final int seekBar1=0x7f040005;
-        public static final int tools=0x7f040003;
-        public static final int undo=0x7f04000a;
+        public static final int seekBar1=0x7f040006;
+        public static final int spinner=0x7f040004;
+        public static final int undo=0x7f04000b;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int tools=0x7f030001;
+        public static final int row=0x7f030001;
+        public static final int tools=0x7f030002;
     }
     public static final class menu {
         public static final int activity_main=0x7f080000;

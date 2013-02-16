@@ -14,5 +14,7 @@
 <color name="Orange">#ffa200</color>   
 <color name="White">#ffFFFF</color>   
  <color name="Black">#000000</color>
+ <color name="Wood">#deac6a</color>
+ 
 
 </resources>
