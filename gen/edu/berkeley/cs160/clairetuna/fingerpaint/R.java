@@ -55,28 +55,35 @@ containing a value of this type.
         public static final int red_orange_button=0x7f020006;
     }
     public static final class id {
-        public static final int button1=0x7f040003;
         public static final int canvas=0x7f040002;
-        public static final int dicks=0x7f040008;
-        public static final int fingerprint_container=0x7f040009;
+        public static final int clear=0x7f040009;
+        public static final int colorpicker=0x7f040008;
+        public static final int dicks=0x7f040006;
+        public static final int fingerprint_container=0x7f040007;
         public static final int left=0x7f040000;
-        public static final int menu_settings=0x7f04000a;
-        public static final int pie=0x7f040006;
-        public static final int redo=0x7f040005;
+        public static final int menu_item_save=0x7f04000d;
+        public static final int menu_item_share=0x7f04000c;
+        public static final int pie=0x7f040004;
+        public static final int redo=0x7f04000b;
         public static final int right=0x7f040001;
-        public static final int seekBar1=0x7f040007;
-        public static final int undo=0x7f040004;
+        public static final int seekBar1=0x7f040005;
+        public static final int tools=0x7f040003;
+        public static final int undo=0x7f04000a;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
+        public static final int tools=0x7f030001;
     }
     public static final class menu {
         public static final int activity_main=0x7f080000;
     }
     public static final class string {
         public static final int app_name=0x7f060000;
+        public static final int clear=0x7f060005;
         public static final int erase_button=0x7f060002;
         public static final int menu_settings=0x7f060001;
+        public static final int redo=0x7f060004;
+        public static final int undo=0x7f060003;
     }
     public static final class style {
         /** 

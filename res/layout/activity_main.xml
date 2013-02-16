@@ -23,21 +23,13 @@
        
 
         
+
+
         <Button
-        android:id="@+id/button1"
+        android:id="@+id/tools"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/erase_button" />
-        <Button
-        android:id="@+id/undo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="u" />
-        <Button
-        android:id="@+id/redo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="r" />
+        android:text="tool" />
 
     
     
