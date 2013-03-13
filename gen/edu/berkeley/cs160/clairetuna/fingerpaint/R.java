@@ -70,7 +70,7 @@ containing a value of this type.
         public static final int canvas=0x7f040002;
         public static final int clear=0x7f04000c;
         public static final int colorpicker=0x7f04000b;
-        public static final int fingerprint_container=0x7f040007;
+        public static final int fingerprint_container=0x7f040006;
         public static final int icon=0x7f04000a;
         public static final int left=0x7f040000;
         public static final int menu_item_save=0x7f040010;
@@ -79,8 +79,8 @@ containing a value of this type.
         public static final int pie=0x7f040003;
         public static final int redo=0x7f04000e;
         public static final int right=0x7f040001;
-        public static final int seekBar1=0x7f040008;
-        public static final int spinner=0x7f040006;
+        public static final int seekBar1=0x7f040007;
+        public static final int spinner=0x7f040008;
         public static final int undo=0x7f04000d;
         public static final int whiteButton=0x7f040004;
     }

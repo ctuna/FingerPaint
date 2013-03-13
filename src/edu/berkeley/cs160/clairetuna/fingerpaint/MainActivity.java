@@ -546,7 +546,9 @@ public class MainActivity extends Activity{
         
         String mode; 
         public boolean onTouchEvent(MotionEvent event) {
-        	
+        	if (mode.equals("scribble")){
+        		vPaint.setStyle(Paint.Style.STROKE);
+        	}
             newX = event.getX();
             newY = event.getY();
             float dX;
@@ -562,11 +564,11 @@ public class MainActivity extends Activity{
             	startX = newX;
         		startY=newY;
         		vPaint.setStrokeCap(Paint.Cap.ROUND);
-        		vPath.reset();
+        		vPath= new Path();
                 vPath.moveTo(newX, newY);
                 
             	if (mode.equals("scribble")){
-            
+                vPaint.setStyle(Paint.Style.STROKE);
                 vCanvas.drawPath(vPath, vPaint);
             	}
                 
@@ -615,6 +617,7 @@ public class MainActivity extends Activity{
             		           		
       				undo();
             		vPath= new Path();
+            		
             		vPath.moveTo(startX, startY);
             		vPath.lineTo(newX, newY);
             		

@@ -119,8 +119,8 @@ public class Preview extends View{
     	res = getResources();
     	//TODO: make paint
     	vPaint.setStyle(Paint.Style.FILL);
-    	canvas.drawCircle(110, 100, radius+ 3, whitePaint);
-    	canvas.drawCircle(110, 100, radius,  vPaint);
+    	canvas.drawCircle(100, 100, radius+ 3, whitePaint);
+    	canvas.drawCircle(100, 100, radius,  vPaint);
     	
         
     }

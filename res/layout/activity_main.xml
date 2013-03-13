@@ -64,12 +64,7 @@
         android:layout_width="20dp"
         android:layout_height="fill_parent"/>
       	
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="100dp"
-        android:layout_height="fill_parent"
-        
-        />
+
 
 
 
@@ -79,7 +74,7 @@
         
         
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="150dp"
             android:layout_height="fill_parent"
             android:gravity="bottom"
             android:orientation="vertical" >
@@ -88,14 +83,16 @@
   		
             <RelativeLayout
                 android:id="@+id/fingerprint_container"
-                android:layout_width="fill_parent"
+                android:layout_width="150dp"
                 android:layout_height="150dp"
                  ></RelativeLayout>
             
-           
+           <View
+        android:layout_width="20dp"
+        android:layout_height="1dp"/>       
     <SeekBar
         android:id="@+id/seekBar1"
-        android:layout_width="fill_parent"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
   	
   		android:max="100" />
@@ -105,7 +102,12 @@
         </LinearLayout>
     
 
-    
+        <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="100dp"
+        android:layout_height="fill_parent"
+        
+        />
 
 
     </LinearLayout>
